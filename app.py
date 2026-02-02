@@ -28,6 +28,9 @@ app.db = db
 
 # Register routes
 app.register_blueprint(auth_bp, url_prefix="/api")
+@app.route("/")
+def home():
+    return "Backend running"
 
 if __name__ == "__main__":
     # Flask host, port, debug mode from .env
