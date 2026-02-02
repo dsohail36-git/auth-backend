@@ -12,12 +12,12 @@ load_dotenv()
 app = Flask(__name__)
 
 # Enable CORS dynamically from .env
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+FRONTEND_URL = os.getenv("FRONTEND_URL")
 CORS(app, origins=[FRONTEND_URL])
 
 # MongoDB configuration from .env
 MONGO_URI = os.getenv("MONGO_URI")
-DB_NAME = os.getenv("DB_NAME", "Authentication")
+DB_NAME = os.getenv("DB_NAME")
 
 if not MONGO_URI:
     raise ValueError("MONGO_URI not set in .env file")
@@ -31,8 +31,8 @@ app.register_blueprint(auth_bp, url_prefix="/api")
 
 if __name__ == "__main__":
     # Flask host, port, debug mode from .env
-    HOST = os.getenv("FLASK_HOST", "0.0.0.0")
-    PORT = int(os.getenv("FLASK_PORT", 5001))
+    HOST = os.getenv("FLASK_HOST")
+    PORT = int(os.getenv("FLASK_PORT"))
     DEBUG = os.getenv("FLASK_DEBUG", "True").lower() == "true"
 
     app.run(host=HOST, port=PORT, debug=DEBUG)
