@@ -27,7 +27,7 @@ db = client[DB_NAME]
 app.db = db
 
 # Register routes
-app.register_blueprint(auth_bp, url_prefix="/api")
+app.register_blueprint(auth_bp)
 @app.route("/")
 def home():
     return "Backend running"
