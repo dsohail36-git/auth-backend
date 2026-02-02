@@ -1,48 +1,38 @@
-# from flask import Flask, request, jsonify
-# from flask_cors import CORS 
-# from routes.auth_routes import auth_bp
-# from pymongo import MongoClient
-
-# from pathlib import Path
-
-# app = Flask(__name__)
-
-# # Fix: Enable CORS only for frontend origin
-# CORS(app, origins=["http://localhost:3000"])
-
-# # Fix: Properly setup MongoDB connection and assign db to app.db for access in routes
-# client = MongoClient("mongodb://localhost:27017/")
-# db = client['Authentication'] 
-# app.db = db
-
-# # Fix: Register blueprint with '/api' prefix so React calls to /api/login will work
-# app.register_blueprint(auth_bp, url_prefix="/api")
-
-# if __name__ == "__main__":
-#     app.run(host="0.0.0.0", port=5001, debug=True)
-
-
-from flask import Flask, request, jsonify
-from flask_cors import CORS 
+from flask import Flask
+from flask_cors import CORS
 from routes.auth_routes import auth_bp
 from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
 
+# Load environment variables from .env
+load_dotenv()
+
+# Flask app
 app = Flask(__name__)
 
-# Enable CORS (local React frontend)
-CORS(app, origins=["http://localhost:3000"])
+# Enable CORS dynamically from .env
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+CORS(app, origins=[FRONTEND_URL])
 
-load_dotenv()
-# ✅ Use environment variable for MongoDB
+# MongoDB configuration from .env
 MONGO_URI = os.getenv("MONGO_URI")
-client = MongoClient(MONGO_URI)
+DB_NAME = os.getenv("DB_NAME", "Authentication")
 
-db = client["Authentication"]
+if not MONGO_URI:
+    raise ValueError("MONGO_URI not set in .env file")
+
+client = MongoClient(MONGO_URI)
+db = client[DB_NAME]
 app.db = db
 
+# Register routes
 app.register_blueprint(auth_bp, url_prefix="/api")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    # Flask host, port, debug mode from .env
+    HOST = os.getenv("FLASK_HOST", "0.0.0.0")
+    PORT = int(os.getenv("FLASK_PORT", 5001))
+    DEBUG = os.getenv("FLASK_DEBUG", "True").lower() == "true"
+
+    app.run(host=HOST, port=PORT, debug=DEBUG)
